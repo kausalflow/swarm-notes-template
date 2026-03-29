@@ -1,4 +1,5 @@
 {
   "site": "https://kausalflow.com",
-  "base": "/swarm-notes-template/"
+  "base": "/swarm-notes-template/",
+  "trailingSlash": "always"
 }
