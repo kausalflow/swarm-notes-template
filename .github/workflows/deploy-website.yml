@@ -3,10 +3,14 @@ name: Deploy Astro site to Pages
 on:
   push:
     branches: ["main", "master"]
-    #paths:
+    # paths:
     #  - "swarm-notes-ui/**"
     #  - "vault/**"
   workflow_dispatch:
+  workflow_run:
+    workflows: ["Autonomous Research Tracker"]
+    types:
+      - completed
 
 permissions:
   contents: read
@@ -23,6 +27,7 @@ env:
 jobs:
   build:
     name: Build
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
