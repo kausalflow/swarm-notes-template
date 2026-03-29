@@ -1,0 +1,63 @@
+name: Autonomous Research Tracker
+
+on:
+  schedule:
+    # Run every Monday at 06:00 UTC
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+    inputs:
+      config_file:
+        description: "Path to the configuration file (e.g., configs/config.ts.yaml)"
+        required: false
+        default: "configs/config.ts.yaml"
+
+permissions:
+  contents: write
+
+jobs:
+  run-pipeline:
+    name: Run Research Pipeline
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          # Fetch full history so auto-commit can push cleanly
+          fetch-depth: 0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Set up Python 3.11
+        run: uv python install 3.11
+
+      - name: Install swarm-notes
+        run: uv tool install swarm-notes
+
+      - name: Run agent pipeline
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.LLM_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          LLM_MODEL: ${{ secrets.LLM_MODEL || vars.LLM_MODEL }}
+          CONFIG_FILE: ${{ github.event.inputs.config_file || 'configs/config.ts.yaml' }}
+        run: uvx swarm-notes --config "$CONFIG_FILE"
+
+      - name: Upload tmp_vault artifact
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: tmp-vault-${{ github.run_id }}
+          path: tmp_vault/**/*
+          if-no-files-found: ignore
+
+      - name: Commit and push new vault files
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "data(vault): autonomous update"
+          commit_author: "research-cruise-bot <research-cruise-bot@users.noreply.github.com>"
+          file_pattern: "vault/**/*.*"
+          skip_dirty_check: false
