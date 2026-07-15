@@ -28,3 +28,9 @@ skills_dir: "skills"                       # Root directory for skills
 
 # Experimental domain expert agent (crawls HTML, consumes token quotas)
 enable_domain_expert: true
+
+# Add (or update) these keys:
+daily_archive_cutoff_days: 30
+daily_overview_include_archived: false
+daily_overview_link_prefix: "/discussions"
+vault_overview_file: "vault/discussions/_overview.md"
