@@ -44,10 +44,7 @@ jobs:
           LLM_MODEL: ${{ secrets.LLM_MODEL || vars.LLM_MODEL }}
           CONFIG_FILE: ${{ github.event.inputs.config_file || 'configs/config.ts.yaml' }}
         run: |
-          uvx swarm-notes --config "$CONFIG_FILE" \
-            --archive-dailies-older-than 30 \
-            --exclude-archived-in-overview \
-            --overview-file "vault/discussions/_overview.md"
+          uvx swarm-notes --config "$CONFIG_FILE"
 
       - name: Upload tmp_vault artifact
         if: ${{ always() }}
