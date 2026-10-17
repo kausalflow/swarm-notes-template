@@ -33,7 +33,7 @@ jobs:
         run: uv python install 3.11
 
       - name: Install swarm-notes
-        run: uv tool install swarm-notes
+        run: uv tool install swarm-notes==0.3.4
 
       - name: Run agent pipeline
         env:
